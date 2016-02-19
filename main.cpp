@@ -1,5 +1,7 @@
 #include "mbed.h"
 #include "QTRSensors.h"
+#include "motordriver.h"
+#include "solenoiddriver.h"
 
 #define NUM_SENSORS 8
 #define TIMEOUT 2000
@@ -7,6 +9,14 @@
 
 #define NUM_ANALOG_SENSORS 1
 #define ANALOG_SAMPLE_RATE 4
+
+//initialise wheel motors 
+//TODO: check pins
+Motor A(PTA4, PTC6, PTC5, 1); // pwm, fwd, rev, can break
+Motor B(PTA12, PTC7, PTC0, 1); // pwm, fwd, rev, can break
+
+//initialise solenoid motor
+solenoid_motor C (PTC8, PTC10); //pwm, on_off
 
 //declare PID variables and motor direction variables
 //TODO: test pwm, direction values, check average speed value
@@ -124,8 +134,14 @@ void follow_line(){
         speedB=avgSpeed;
     }
     
-    //TODO: write speed and pwm to each motor 
+    //normalise speed to 1.0; -1.0
+    speedA = speedA/255;
+    speedB = speedB/255;
     
+    //write speed to each motor
+    A.speed(speedA);
+    B.speed(speedB);
+     
     lastError=inst_error;
     
 }
@@ -142,7 +158,14 @@ void barc0de_scan(){
 }
 
 
+
+
+
 int main(){
+    
+    //initialise stopping duty cycle (ie: how hard the motor brakes)
+    //TODO: test values
+    float stop_duty = 0.5;
     
     //initialise line following sensor IC
     qtrc.init(&qtrc_pins[8], NUM_SENSORS, TIMEOUT, emitterPin);  // 800 us timeout, no emitter pin
@@ -177,13 +200,17 @@ int main(){
        
         }
         
-        //stop wheel motors
+        //stop wheel motors TODO: figure out duty cycle??
+        A.stop(stop_duty);
+        B.stop(stop_duty);
         //start solenoid motor
         //load ball
         //wait till ball is shot
         //stop solenoid motor
-        //start wheel motor
-        barc0de_scan();
+        //start wheel motor        
+        readValues();
+        calculateProportional();
+        follow_line();
     }        
     return 0;
 }
