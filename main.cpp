@@ -1,14 +1,10 @@
 #include "mbed.h"
-#include "QTRSensors.h"
 #include "motordriver.h"
 #include "solenoiddriver.h"
 
 #define NUM_SENSORS 8
-#define TIMEOUT 2000
 #define avgSpeed 255
 
-#define NUM_ANALOG_SENSORS 1
-#define ANALOG_SAMPLE_RATE 4
 
 //initialise wheel motors 
 //TODO: check pins
@@ -37,19 +33,6 @@ int proportional = 0;
 int derivative = 0;
 int integral = 0;
 
-//instantiate line following QTR sensor object and declare setup variables  
-/*QTRSensorsRC qtrc;
-PinName qtrc_pins[] = {(PTA1),(PTA2),(PTD4),(PTA12),(PTA4),(PTA5),(PTC8),(PTC9)};   
-PinName emitterPin = NC;
-unsigned int sensorValues[NUM_SENSORS];
-
-
-
-//instantiate barcode sensor object
-QTRSensorsAnalog qtra;
-PinName qtra_pin = (PTC2);
-unsigned int analog_sensorValues[NUM_ANALOG_SENSORS];*/
-
 
 //setup sensor in from arduino
 DigitalIn sensorValues[] = {(PTA1),(PTA2),(PTD4),(PTA12),(PTA4),(PTA5),(PTC8),(PTC9)};
@@ -57,23 +40,13 @@ DigitalIn sensorValues[] = {(PTA1),(PTA2),(PTD4),(PTA12),(PTA4),(PTA5),(PTC8),(P
 //setup barcode scanner from arduino
 DigitalIn analog_sensorValues (PTC2);
 
-//readvalue function assigns 1 or 0 to sensor value depending on whether it is reading white or black
-//TODO: test value at which sensor differentiates white or black
+//read incoming arduino value
 void readValues(){
     
     for (int i=0; i<NUM_SENSORS; i++){
         
         sensorValues[i] = sensorValues[i];
-        
         }
-    
-    /*qtrc.read(sensorValues);
-    for (int i=0; i<NUM_SENSORS; i++){
-        if(sensorValues[i]>400)
-        sensorValues[i]=1;
-        else
-        sensorValues[i]=0;
-    }*/
 }
 
 void calculateProportional(){
@@ -159,18 +132,9 @@ void follow_line(){
     
 }
 
-
+//read barcode value from arduino
 void barc0de_scan(){   
-    
-    
     analog_sensorValues = analog_sensorValues;
-    /*qtra.read(analog_sensorValues);
-    for (int i=0; i<NUM_SENSORS; i++){
-        if(analog_sensorValues[i]>400)
-        analog_sensorValues[i]=1;
-        else
-        analog_sensorValues[i]=0;
-    }*/
 }
 
 
@@ -181,30 +145,8 @@ int main(){
     
     //initialise stopping duty cycle (ie: how hard the motor brakes)
     //TODO: test values
-    //float stop_duty = 0.5;
+    float stop_duty = 0.5;
     
-    //initialise line following sensor IC
-    //qtrc.init(&qtrc_pins[8], NUM_SENSORS, TIMEOUT, emitterPin);  // 800 us timeout, no emitter pin
-    
-    //initialise barcode sensor IC
-    //qtra.init(&qtra_pin, NUM_ANALOG_SENSORS, ANALOG_SAMPLE_RATE, emitterPin);
-    
-    // optional: wait for some input from the user, such as  a button press
- 
-    // then start calibration phase and move the sensors over both
-    // reflectance extremes they will encounter in your application:
-    
-    /*int i;
-    for (i = 0; i < 250; i++)  // make the calibration take about 5 seconds
-    {
-        qtrc.calibrate(QTR_EMITTERS_ON);
-        wait(20);
-    }
- 
-    // optional: signal that the calibration phase is now over and wait for further
-    // input from the user, such as a button press
-    
-    */
     while(1){
  
         while (analog_sensorValues == 0){ //while bar code scanner reads no line
@@ -219,10 +161,12 @@ int main(){
         //stop wheel motors TODO: figure out duty cycle??
         A.stop(stop_duty);
         B.stop(stop_duty);
+        
         //start solenoid motor
         //load ball
         //wait till ball is shot
         //stop solenoid motor
+        
         //start wheel motor        
         readValues();
         calculateProportional();
