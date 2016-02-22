@@ -11,9 +11,6 @@
 Motor A(PTA4, PTC6, PTC5, 1); // pwm, fwd, rev, can break
 Motor B(PTA12, PTC7, PTC0, 1); // pwm, fwd, rev, can break
 
-//initialise solenoid motor
-solenoid_motor C (PTC8, PTC10); //pwm, on_off
-
 //declare PID variables and motor direction variables
 //TODO: test pwm, direction values, check average speed value
 //int time = 0;
@@ -40,11 +37,13 @@ DigitalIn sensorValues[] = {(PTA1),(PTA2),(PTD4),(PTA12),(PTA4),(PTA5),(PTC8),(P
 //setup barcode scanner from arduino
 DigitalIn analog_sensorValues (PTC2);
 
+//TODO: write solenoid motor driver function
+
+
 //read incoming arduino value
 void readValues(){
     
     for (int i=0; i<NUM_SENSORS; i++){
-        
         sensorValues[i] = sensorValues[i];
         }
 }
@@ -136,8 +135,6 @@ void follow_line(){
 void barc0de_scan(){   
     analog_sensorValues = analog_sensorValues;
 }
-
-
 
 
 
